@@ -10,7 +10,7 @@ Initializing a Glue42 Client means initializing the [**Glue42 Web**](../../../..
 
 - the default built-in library settings;
 - settings from the *optional* `glue.config.json` file that will override the default library settings;
-- settings from the *optional* [`Config`](../../../../reference/core/latest/glue42%20web/index.html#!Config) object passed to the [factory function](#factory_function) during initialization that will override the built-in library settings and/or the settings in the `glue.config.json` file;
+- settings from the *optional* [`Config`](../../../../reference/core/latest/glue42%20web/index.html#!Config) object passed to the factory function during initialization that will override the built-in library settings and/or the settings in the `glue.config.json` file;
 
 *More detailed information on how to initialize the Glue42 Web library depending on the framework you are using, you can find in the [**JavaScript**](../javascript/index.html) and [**React**](../react/index.html) guides on how to set up your application.*
 
@@ -66,7 +66,7 @@ There are several scenarios where you may want to tweak the default configuratio
 
 - Your Glue42 Environment files are not located at the default directory - e.g., you decide to keep them in a `"/lib"` folder, instead of in the default `"/glue"` folder. In this case, it is mandatory that you specify the custom path to the Environment files when initializing the Glue42 Web library in your client applications. 
 
-The *optional* [`Config`](../../../../reference/core/latest/glue42%20web/index.html#!Config) object, which you can pass to the `GlueWeb()` factory function, has the following properties:
+The *optional* [`Config`](../../../../reference/core/latest/glue42%20web/index.html#!Config) object, which you can pass to the factory function when initializing the [**Glue42 Web**](../../../../reference/core/latest/glue42%20web/index.html) library, has the following properties:
 
 | Property | Type | Description | Required | Default |
 |----------|------|-------------|----------|---------|
@@ -78,9 +78,9 @@ The *optional* [`Config`](../../../../reference/core/latest/glue42%20web/index.h
 
 *Note that if you set `extends` to `false`, then, by default, all clients will try to connect to the worker at `/glue/worker.js`. You need to set the `worker` property, if you want to override the default setting.*
 
-## Initialization Example
+## Configuration Example
 
-Below is an initialization example with custom settings for the Glue42 Web library:
+Below is an example of a custom configuration for the Glue42 Web library:
 
 ```javascript
 const initOptions = {
@@ -101,8 +101,4 @@ const initOptions = {
         autoSaveWindowContext: true
     }
 };
-
-// Use the object returned from the factory function
-// to access the Glue42 Core APIs
-const glue = await GlueWeb(initOptions);
 ```

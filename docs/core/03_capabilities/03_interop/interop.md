@@ -41,11 +41,11 @@ Use App B and App C to register Interop methods by providing a method name. Inpu
 
 <!-- example 3 -->
 
-- #### Method Added Event
+- #### Method Events
 
-The applications below demonstrate discovering Interop methods by subscribing to the [`methodAdded()`](../../../reference/core/latest/interop/index.html#!API-methodAdded) event of the Interop API. 
+The applications below demonstrate discovering Interop methods by subscribing to the [`serverMethodAdded()`](../../../reference/core/latest/interop/index.html#!API-serverMethodAdded) and the [`serverMethodRemoved()`](../../../reference/core/latest/interop/index.html#!API-serverMethodRemoved) events of the Interop API. 
 
-On load, App A subscribes to the `methodAdded()` event and will print the name of each newly registered method. Use App B and App C to register Interop methods by providing a method name.
+On load, App A subscribes to the `serverMethodAdded()` and `serverMethodRemoved()` events and will print the names of the newly registered method and the server offering it. Use App B and App C to register Interop methods by providing a method name.
 
 <!-- example 4 -->
 
