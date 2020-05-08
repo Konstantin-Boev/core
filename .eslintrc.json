@@ -12,7 +12,8 @@
         "sourceType": "module"
     },
     "ignorePatterns": [
-		"tutorials/*", 
+        "tutorials/*", 
+        "docs/*",
 		"packages/web/**/*.js", 
 		"packages/core/**/*.js"
 	],

@@ -1,6 +1,6 @@
 {
-    "short_name": "Stocks Tutorial",
-    "name": "Glue Web Stocks Tutorial",
+    "short_name": "Clients Tutorial",
+    "name": "Glue Web Clients Tutorial",
     "icons": [
         {
             "src": "./assets/favicon.ico",
@@ -18,8 +18,8 @@
             "sizes": "512x512"
         }
     ],
-    "start_url": "/",
-    "scope": "/",
+    "start_url": "/clients/",
+    "scope": "/clients/",
     "display": "standalone",
     "theme_color": "#000000",
     "background_color": "#ffffff"
