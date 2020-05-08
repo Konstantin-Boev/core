@@ -50,7 +50,7 @@ GlueProvider: FC<GlueProviderProps>;
 
 - `children` - React components which may contain Glue42 related logic;
 - `fallback` - *Optional*. A React component to display while initializing Glue42;
-- `config` - *Optional*. A [Config](../../../../reference/core/latest/glue42%20web/index.html) object for the `GlueWeb()` factory function;
+- `config` - *Optional*. A [Config](../../../../reference/core/latest/glue42%20web/index.html#!Config) object for the `GlueWeb()` factory function (for detailed configuration options, see the [Glue42 Client: Overview](../overview/index.html#initializing_a_glue42_client) section);
 - `glueFactory` - *Optional*. Factory function used to initialize the Glue42 Web library. Defaults to `window.GlueWeb`.
 
 - #### GlueContext
@@ -83,12 +83,7 @@ Below is the signature of `useGlue()`:
 
 - #### useGlueInit()
 
-**useGlueInit** is a React Hook which takes care of initializing Glue library. It can be used to customize the initialization logic for the Glue integration within you application.
-
-| Property      | Type                          | Description                                                 | Default                            |
-| ------------- | ----------------------------- | ----------------------------------------------------------- | ---------------------------------- |
-| `config`      | [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html)     | **Optional** Configuration object for Glue factory function | [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) |
-| `glueFactory` | [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) | **Optional** Factory function used to initialize Glue       | `window.Glue`                      |
+The `useGlueInit()` hook is a React hook which initializes the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library. It accepts an *optional* [Config](../../../../reference/core/latest/glue42%20web/index.html#!Config) object and an *optional* Glue42 factory function as arguments.
 
 ```typescript
 useGlueInitProps = (
@@ -99,13 +94,20 @@ useGlueInitProps = (
 useGlueInit: useGlueInitProps;
 ```
 
+- `config` - *Optional*. A [Config](../../../../reference/core/latest/glue42%20web/index.html#!Config) object for the `GlueWeb()` factory function (for detailed configuration options, see the [Glue42 Client: Overview](../overview/index.html#initializing_a_glue42_client) section);
+- `glueFactory` - *Optional*. Factory function used to initialize the Glue42 Web library. Defaults to `window.GlueWeb`.
+
 ## Usage
 
 Below you can see some examples of using the Glue42 React Hooks library.
 
-### GlueProvider
+### Initialization
 
-Add **GlueProvider** component by wrapping your other components inside (preferably the **Root** one):
+To access the Glue42 Web APIs, you need to initialize and (optionally) configure the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library (for detailed configuration options, see the [Glue42 Client: Overview](../overview/index.html#initializing_a_glue42_client) section). You can do this in two ways - by using the `GlueProvider` component or the `useGlueInit()` hook. The difference is that the `GlueProvider` initializes the Glue42 Web library and makes the returned API object (`glue`) globally available by automatically assigning it as a value to `GlueContext`, while the `useGlueInit()` hook initializes the library and returns an API object (`glue`) which you then have to make available to your other components by passing it as a prop, by creating a context or by attaching it to the global `window` object.
+
+- #### GlueProvider
+
+Add the `GlueProvider` component by wrapping your other components inside it (preferably the root one). `GlueProvider` will initialize the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library and make the Glue42 Web APIs available in your application by setting a `glue` object (returned from the initialization) as the value of `GlueContext`:
 
 ```javascript
 //index.js
@@ -113,198 +115,148 @@ import "glue42/web";
 import { GlueProvider } from "glue42/react-hooks";
 
 ReactDOM.render(
-  <GlueProvider>
-    <Root />
-  </GlueProvider>,
-  document.getElementById("root")
+    // Wrap your root component in the `GlueProvider` in order
+    // to be able to access the Glue42 Web APIs from all child components.
+    <GlueProvider fallback={<h2>Loading...</h2>}>
+        <App />
+    </GlueProvider>,
+    document.getElementById("root")
 );
 ```
 
-Example:
+- #### useGlueInit()
+
+You can also initialize the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library with the `useGlueInit()` hook. Below is an example of conditional rendering of a component based on whether the Glue42 Web API is available or not. 
 
 ```javascript
-import { GlueProvider } from "glue42/react-hooks";
+import "glue42/web";
+import { useGlueInit } from "@glue42/react-hooks";
 
-ReactDOM.render(
-  <GlueProvider fallback={<h2>Loading...</h2>}>
-    <YourApplication />
-  </GlueProvider>,
-  document.getElementById("root")
-);
+const App = () => {
+    // Example custom configuration for the Glue42 Web library.
+    const config = {
+        extends: false,
+        worker: "./lib/worker.js"
+    }
+    const glue = useGlueInit(config);
+
+    return glue ? <Main glue={glue} /> : <Loader />;
+};
+
+export default App;
 ```
 
-### GlueContext
+Remember that when you initialize the Glue42 Web library with the `useGlueInit()` hook, you need to take care of the way you provide the `glue` object to your nested components. For example, you can use React Context or attach it to the global `window` variable.
 
-Using the built in React hook **useContext** you can get direct access to the global **glue** object and do whatever you want:
+### Consuming Glue42 Web APIs
+
+After the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library has been successfully initialized, you can access the Glue42 Web APIs with the built-in React hook `useContext()` and passing `GlueContext` as its argument, or with the `useGlue()` hook.
+
+- #### GlueContext
+
+Below is an example of accessing the `glue` object with `GlueContext` and using the [Shared Contexts](../../../../reference/core/latest/shared%20contexts/index.html) API to get the context of the current window:
 
 ```javascript
 import { useContext, useState, useEffect } from "react";
 import { GlueContext } from "@glue42/react-hooks";
 
-const Application = () => {
-  const [context, setContext] = useState({});
-  const glue = useContext(GlueContext);
-  useEffect(() => {
-    setContext(glue.windows.my().context);
-  }, []);
+const App = () => {
+    const [context, setContext] = useState({});
+    // Access the Glue42 Web APIs by using the `glue` object 
+    // assigned as a value to `GlueContext` by the `GlueProvider` component.
+    const glue = useContext(GlueContext);
 
-  return (
-    <div>
-      <h2>My Window Context</h2>
-      <pre>{JSON.stringify(context, null, 4)}</pre>
-    </div>
-  );
+    useEffect(() => {
+        setContext(glue.windows.my().context);
+    }, []);
+
+    return (
+        <div>
+            <h2>My Window Context</h2>
+            <pre>{JSON.stringify(context, null, 4)}</pre>
+        </div>
+    );
 };
 
-export default Application;
+export default App;
 ```
 
-Example:
+- #### useGlue()
 
-```javascript
-import { GlueContext } from "glue42/react-hooks";
-import { useContext } from "react";
-
-export const App = () => {
-  const glue = useContext(GlueContext);
-  return <pre>{JSON.stringify(glue.windows.my().context)}</pre>;
-};
-```
-
-### useGlue
-
-Now you can start using Glue42 idiomatically in the context of ReactJS via hooks in your functional components:
+Below is an example of accessing the `glue` object with the `useGlue()` hook and using the [Window Management](../../../../reference/core/latest/windows/index.html) API to open apps in new windows on button click:
 
 ```javascript
 import { useGlue } from "@glue42/react-hooks";
 
-const Application = () => {
-  const openWindow = useGlue(glue => (name, url) => {
-    glue.windows.open(name, url);
-  });
-  return (
-    <table>
-      <tr>
-        <td> Client List </td>
-        <td>
-          <button
-            onClick={() => {
-              openWindow("ClientList", "http://localhost:8080/client-list");
-            }}
-          >
-            Start
-          </button>
-        </td>
-      </tr>
-      <tr>
-        <td> Client Portfolio </td>
-        <td>
-          <button
-            onClick={() => {
-              openWindow(
-                "ClientPortfolio",
-                "http://localhost:8080/client-portfolio"
-              );
-            }}
-          >
-            Start
-          </button>
-        </td>
-      </tr>
-      <tr>
-        <td> Stock Details </td>
-        <td>
-          <button
-            onClick={() => {
-              openWindow("StockDetails", "http://localhost:8080/stock-details");
-            }}
-          >
-            Start
-          </button>
-        </td>
-      </tr>
-    </table>
-  );
+const App = () => {
+    const openWindow = useGlue(glue => (name, url) => {
+        glue.windows.open(name, url);
+    });
+
+    return (
+        <table>
+            <tr>
+                <td> Client List </td>
+                <td>
+                    <button
+                        onClick={() => {
+                            openWindow("ClientList", "http://localhost:8080/client-list");
+                        }}
+                    >
+                        Start
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td> Client Portfolio </td>
+                <td>
+                    <button
+                        onClick={() => {
+                            openWindow("ClientPortfolio", "http://localhost:8080/client-portfolio");
+                        }}
+                    >
+                        Start
+                    </button>
+                </td>
+            </tr>
+        </table>
+    );
 };
 
-export default Application;
+export default App;
 ```
 
-Example:
-
-```javascript
-import { useGlue } from "@glue42/react-hooks";
-
-export const Application = () => {
-  const openWindow = useGlue(glue => (name, url) => {
-    glue.windows.open(name, url);
-  });
-  return (
-    <button
-      onClick={() => {
-        openWindow("ClientList", "http://localhost:8080/client-list");
-      }}
-    >
-      Start
-    </button>
-  );
-};
-```
+This is an example of using the [Interop](../../../../reference/core/latest/interop/index.html) API to get the window title through an already registered Interop method:  
 
 ```javascript
 import { useGlue } from "@glue42/react-hooks";
 import { useState } from "react";
 
-export const Application = () => {
-  const [title, setTitle] = useState("");
-  const getTitle = useGlue(glue => methodName => {
-    glue.interop.invoke(methodName).then(r => setTitle(r.returned._result));
-  });
-  return (
-    <>
-      <h2>{title}</h2>
-      <button
-        onClick={() => {
-          getTitle("T42.Demo.GetTitle");
-        }}
-      >
-        Get Title
-      </button>
-    </>
-  );
+const App = () => {
+    const [title, setTitle] = useState("");
+    const getTitle = useGlue(glue => methodName => {
+        glue.interop.invoke(methodName).then(r => setTitle(r.returned._result));
+    });
+    return (
+        <>
+            <h2>{title}</h2>
+            <button
+                onClick={() => {
+                    getTitle("T42.Demo.GetTitle");
+                }}
+            >
+                Get Title
+            </button>
+        </>
+    );
 };
+
+export default App;
 ```
 
-### useGlueInit
+### Testing
 
-Example:
-
-```javascript
-import "glue42/web";
-import { useGlueInit } from "@glue42/react-hooks";
-
-export const Application = () => {
-  const glue = useGlueInit();
-  return glue ? <App glue={glue} /> : <Loader />;
-};
-```
-
-### **useGlueInit** hook so you can render conditionally your app when glue is initialized:
-
-```javascript
-import "glue42/web";
-import { useGlueInit } from "@glue42/react-hooks";
-
-export const Application = () => {
-  const glue = useGlueInit();
-  return glue ? <App glue={glue} /> : <Loader />;
-};
-```
-
-_You need to take care of the way you provide glue object to your nested components (with React Context or attaching it to the window variable)._
-
-
-### Use your own glue factory function for initializing glue. Useful in jest/enzyme tests when you are mocking glue:
+You can use your own Glue42 factory function for initializing the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library. This is useful in Jest/Enzyme tests when you want to mock the Glue42 library: 
 
 ```javascript
 //index.js
@@ -312,26 +264,27 @@ import "glue42/web";
 import { mount } from "enzyme";
 import { GlueProvider } from "glue42/react-hooks";
 
-// url location of the shared worker
+// URL location of the shared worker.
 const glueFactory = () => {
-  const glueObject = {
-    interop: { invoke: jest.fn(), register: jest.fn() },
-    contexts: { subscribe: jest.fn(), update: jest.fn() },
-    windows: { open: jest.fn(), my: jest.fn() }
-  };
-  return Promise.resolve(glueObject);
+    const glueObject = {
+        interop: { invoke: jest.fn(), register: jest.fn() },
+        contexts: { subscribe: jest.fn(), update: jest.fn() },
+        windows: { open: jest.fn(), my: jest.fn() }
+    };
+
+    return Promise.resolve(glueObject);
 };
 
-describe("Mock Glue", () => {
-  it("should mock glue", () => {
-    const wrapper = mount(
-      <GlueProvider glueFactory={glueFactory}>
-        <Root />
-      </GlueProvider>
-    );
-    // do whatever you want
-  });
+describe("Mock Glue42", () => {
+    it("Should mock the Glue42 library.", () => {
+        const wrapper = mount(
+        <GlueProvider glueFactory={glueFactory}>
+            <App />
+        </GlueProvider>
+        );
+        // Your logic here.
+    });
 });
 ```
 
-_You might also checkout the "@testing-library/react-hooks" for testing your react hooks_
+*For additional information on testing React hooks, see the [@testing-library/react-hooks](https://www.npmjs.com/package/@testing-library/react-hooks).*

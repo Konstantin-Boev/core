@@ -22,17 +22,17 @@ When no custom initialization options are passed to the factory function, the Gl
 
 Below are the built-in default settings of the Glue42 Web library (which are also the default settings of the `glue.config.json` file):
 
-```json
+```javascript
 {
-    "glue": {
-        "worker": "./worker.js",
-        "layouts": {
-            "autoRestore": false,
-            "autoSaveWindowContext": false
+    glue: {
+        worker: "./worker.js",
+        layouts: {
+            autoRestore: false,
+            autoSaveWindowContext: false
         }
     },
-    "gateway": {
-        "location": "./gateway.js"
+    gateway: {
+        location: "./gateway.js"
     }
 }
 ```
