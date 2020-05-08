@@ -183,7 +183,7 @@ export default App;
 
 - #### useGlue()
 
-Below is an example of accessing the `glue` object with the `useGlue()` hook and using the [Window Management](../../../../reference/core/latest/windows/index.html) API to open apps in new windows on button click:
+Below is an example of accessing the `glue` object with the `useGlue()` hook and using the [Window Management](../../../../reference/core/latest/windows/index.html) API to open an app in a new window on button click:
 
 ```javascript
 import { useGlue } from "@glue42/react-hooks";
@@ -196,23 +196,11 @@ const App = () => {
     return (
         <table>
             <tr>
-                <td> Client List </td>
+                <td>Client List</td>
                 <td>
                     <button
                         onClick={() => {
                             openWindow("ClientList", "http://localhost:8080/client-list");
-                        }}
-                    >
-                        Start
-                    </button>
-                </td>
-            </tr>
-            <tr>
-                <td> Client Portfolio </td>
-                <td>
-                    <button
-                        onClick={() => {
-                            openWindow("ClientPortfolio", "http://localhost:8080/client-portfolio");
                         }}
                     >
                         Start
@@ -256,7 +244,7 @@ export default App;
 
 ### Testing
 
-You can use your own Glue42 factory function for initializing the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library. This is useful in Jest/Enzyme tests when you want to mock the Glue42 library: 
+You can use your own factory function for initializing the [Glue42Web](../../../../reference/core/latest/glue42%20web/index.html) library. This is useful in Jest/Enzyme tests when you want to mock the Glue42 library: 
 
 ```javascript
 //index.js
@@ -264,7 +252,7 @@ import "glue42/web";
 import { mount } from "enzyme";
 import { GlueProvider } from "glue42/react-hooks";
 
-// URL location of the shared worker.
+// Define a factory function which will mock the Glue42 Web library.
 const glueFactory = () => {
     const glueObject = {
         interop: { invoke: jest.fn(), register: jest.fn() },
@@ -278,6 +266,7 @@ const glueFactory = () => {
 describe("Mock Glue42", () => {
     it("Should mock the Glue42 library.", () => {
         const wrapper = mount(
+        // Pass your factory function to the `GlueProvider` component.
         <GlueProvider glueFactory={glueFactory}>
             <App />
         </GlueProvider>
